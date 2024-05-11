@@ -10,14 +10,14 @@ router.get('/', async () => {
   }
 })
 
-router.get('/api/users/list', [UsersController, 'index'])
+router.get('/api/users/list', [UsersController, 'indexall'])
 router.post('/api/users/store', [UsersController, 'store'])
-router.get('/api/users/:id', [UsersController, 'index2'])
+router.get('/api/users/:id', [UsersController, 'indexunit'])
 router.put('/api/users/:id', [UsersController, 'update'])
 router.delete('/api/users/:id', [UsersController, 'destroy'])
 
-router.get('/api/products/list', [ProductsController, 'index'])
+router.get('/api/products/list', [ProductsController, 'indexall'])
 router.post('/api/products/store', [ProductsController, 'store'])
-router.get('/api/products/:id', [ProductsController, 'index2'])
+router.get('/api/products/:id', [ProductsController, 'indexunit'])
 router.put('/api/products/:id', [ProductsController, 'update'])
 router.delete('/api/products/:id', [ProductsController, 'destroy'])
