@@ -55,6 +55,7 @@
     "@adonisjs/core": "^6.8.0",
     "@adonisjs/cors": "^2.2.1",
     "@adonisjs/lucid": "^20.5.1",
+    "@adonisjs/static": "^1.1.1",
     "@vinejs/vine": "^2.0.0",
     "luxon": "^3.4.4",
     "pg": "^8.11.5",
