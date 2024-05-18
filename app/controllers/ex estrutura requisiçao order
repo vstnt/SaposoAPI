@@ -17,3 +17,20 @@ fornecido pelo gpt quando propos o controlador para criar uma ordem via orders_c
     }
   ]
 }
+
+
+{
+  "name": "Categoria Exemplo"
+}
+
+[
+  {
+    "name": "Categoria Exemplo 1"
+  },
+  {
+    "name": "Categoria Exemplo 2"
+  },
+  {
+    "name": "Categoria Exemplo 3"
+  }
+]

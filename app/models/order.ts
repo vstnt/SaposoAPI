@@ -9,6 +9,12 @@ export default class Order extends BaseModel {
   @column()
   declare userId: number
 
+  @column()
+  declare status: string
+
+  @column()
+  declare total: number
+
   @hasMany(() => OrderItem)
   public items: any
 

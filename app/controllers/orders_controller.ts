@@ -6,6 +6,13 @@ import { createOrderValidator } from '#validators/order'
 import vine from '@vinejs/vine'
 
 export default class OrdersController {
+  async indexorders({}: HttpContext) {
+    return await Order.all()
+  }
+
+  async indexordersitems({}: HttpContext) {
+    return await OrderItem.all()
+  }
 
   async store ({request, response}: HttpContext) {
     // agora vamos usar transação, para garantir de que se alguma parte falhar, a transação será revertida e não feita pela metade
@@ -19,10 +26,10 @@ export default class OrdersController {
       })
 
 
-      const { userId, items } = payload
+      const { userId, items, total, status } = payload
 
       // Cria a ordem
-      const order = await Order.create({ userId }, { client: trx })
+      const order = await Order.create({ userId, total, status }, { client: trx })
 
       // Cria os items da ordem
       for  (const item of items) {
@@ -30,6 +37,7 @@ export default class OrdersController {
           orderId: order.id,
           productId: item.productId,
           quantity: item.quantity,
+          price: item.price,
         }, { client: trx })
       }
 

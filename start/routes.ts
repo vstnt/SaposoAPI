@@ -1,5 +1,7 @@
 // eslint-disable-next-line @adonisjs/prefer-lazy-controller-import
+import CategoriesController from '#controllers/categories_controller'
 import OrdersController from '#controllers/orders_controller'
+import ProductCategoriesController from '#controllers/product_categories_controller'
 import ProductsController from '#controllers/products_controller'
 // eslint-disable-next-line @adonisjs/prefer-lazy-controller-import
 import UsersController from '#controllers/users_controller'
@@ -27,4 +29,11 @@ router.delete('/api/products/:id', [ProductsController, 'destroy'])
 router.get('/api/products/top-selling', [ProductsController, 'topSelling'])
 
 router.post('api/orders', [OrdersController, 'store'])
+router.get('api/orders', [OrdersController, 'indexorders'])
+router.get('api/ordersitems', [OrdersController, 'indexordersitems'])
+
+router.get('api/productscategories', [ProductCategoriesController, 'indexProductsCategories'])
+
+router.get('api/categories', [CategoriesController, 'index'])
+router.post('api/categories', [CategoriesController, 'store'])
 

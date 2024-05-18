@@ -9,10 +9,14 @@ export const createOrderValidator = vine.object({
   items: vine.array(
     vine.object({
       productId: vine.number(),
-      quantity: vine.number()
+      quantity: vine.number(),
+      price: vine.number(),
     })
-  )
+  ),
+  total: vine.number(),
+  status: vine.string(),
 })
+
 
 /**
  * Validator to validate the payload when updating
