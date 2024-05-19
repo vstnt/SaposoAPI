@@ -3,6 +3,7 @@ import Product from '#models/product'
 import app from '@adonisjs/core/services/app'
 import { deleteOldImage, extTypes, imgSize, productsImgsPath, productsImgsPublicPath, productsImgsUrl } from './exports.js'
 import db from '@adonisjs/lucid/services/db'
+
 export default class ProductsController {
   async indexall({}: HttpContext) {
     return await Product.all()
