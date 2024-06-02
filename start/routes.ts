@@ -1,4 +1,5 @@
 // eslint-disable-next-line @adonisjs/prefer-lazy-controller-import
+import AuthController from '#controllers/auth_controller'
 import CategoriesController from '#controllers/categories_controller'
 import OrdersController from '#controllers/orders_controller'
 import ProductCategoriesController from '#controllers/product_categories_controller'
@@ -6,12 +7,17 @@ import ProductsController from '#controllers/products_controller'
 // eslint-disable-next-line @adonisjs/prefer-lazy-controller-import
 import UsersController from '#controllers/users_controller'
 import router from '@adonisjs/core/services/router'
+import { middleware } from './kernel.js'
 
 router.get('/', async () => {
   return {
     hello: 'world',
   }
 })
+
+router.post('/api/signin', [AuthController, 'signin'])
+router.post('/api/validate', [AuthController, 'validateToken']).use(middleware.auth({guards: ['api']}))
+router.post('/api/logout', [AuthController, 'logout']).use(middleware.auth({guards: ['api']}))
 
 router.get('/api/users', [UsersController, 'indexall'])
 router.post('/api/users', [UsersController, 'store'])

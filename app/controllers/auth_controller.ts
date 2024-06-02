@@ -3,35 +3,38 @@ import User from '#models/user'
 
 
 export default class AuthController {
-  public async signin({ request, auth }: HttpContext) {
-    const { email, password } = request.only(['email', 'password'])
 
-    try {
-      // Tenta autenticar o usuário e retorna o token e o usuário autenticado
-      const token = await auth.use('api').attempt(email, password)
-      const user = auth.user
-      return { user: this.getSafeUser(user), token: token.token }
-    } catch {
-      return { error: 'Invalid credentials' }
-    }
+  async signin({ request }: HttpContext) {
+    const { email, password } = request.only(['email', 'password'])
+    const user = await User.verifyCredentials(email, password)
+    const token = await User.accessTokens.create(user)
+    return { user: this.getSafeUser(user), token: token }
   }
 
-  public async validateToken({ auth }: HttpContext) {
+  async validateToken({ auth }: HttpContext) {
     const user = auth.user
+    if (!user) {
+      return { error: 'Invalid token' }
+
+    }
     return { user: this.getSafeUser(user) }
   }
 
-  public async logout({ auth }: HttpContext) {
-    await auth.use('api').revoke()
+  async logout({ auth, request }: HttpContext) {
+    const token = request.input('token')
+    const user = auth.user
+
+    if (user) {
+      await User.accessTokens.delete(user, token)
+    }
     return { status: true }
   }
 
-  private getSafeUser(user: User) {
+  private getSafeUser(user: User) { //aqui tratamos de reduzir os dados de usuário enviados ao front
     return {
       id: user.id,
       name: user.fullName,
       email: user.email,
-      // Adicione outros campos que você deseja expor ao front-end
     }
   }
 }
