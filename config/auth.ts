@@ -2,6 +2,7 @@ import { defineConfig } from '@adonisjs/auth'
 import { InferAuthEvents, Authenticators } from '@adonisjs/auth/types'
 import { tokensGuard, tokensUserProvider } from '@adonisjs/auth/access_tokens'
 
+
 const authConfig = defineConfig({
   default: 'api',
   guards: {
@@ -15,6 +16,8 @@ const authConfig = defineConfig({
 })
 
 export default authConfig
+
+
 
 /**
  * Inferring types from the configured auth

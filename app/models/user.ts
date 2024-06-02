@@ -37,3 +37,8 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
 }
+
+
+// Por padrão, o nome da tabela é inferido a partir do nome do modelo. Por exemplo, se o modelo se chama User,
+// o AdonisJS assume que a tabela correspondente no banco de dados se chama users. No entanto, é possível especificar
+//  explicitamente o nome da tabela no modelo, caso seja necessário.
