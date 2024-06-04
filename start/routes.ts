@@ -20,7 +20,7 @@ router.post('/api/validate', [AuthController, 'validateToken']).use(middleware.a
 router.post('/api/logout', [AuthController, 'logout']).use(middleware.auth({guards: ['api']}))
 
 router.get('/api/users', [UsersController, 'indexall'])
-router.post('/api/users', [UsersController, 'store'])
+router.post('/api/register', [UsersController, 'store'])
 router.get('/api/users/:id', [UsersController, 'indexunit'])
 router.put('/api/users/:id', [UsersController, 'update'])
 router.delete('/api/users/:id', [UsersController, 'destroy'])
