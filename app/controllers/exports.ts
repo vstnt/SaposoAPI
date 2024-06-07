@@ -12,7 +12,7 @@ export async function deleteOldImage(imagePath: string | null) {
 
 export const imgSize = '3mb'
 
-export const extTypes = ['jpg', 'JPG', 'png', 'PNG', 'gif']
+export const extTypes = ['jpg', 'JPG', 'jpeg', 'png', 'PNG', 'gif']
 
 export const usersImgsUrl = 'http://localhost:3333/uploads/usersImgs/'
 export const usersImgsPath = 'public/uploads/usersImgs/'
