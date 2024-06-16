@@ -14,6 +14,16 @@ export default class OrdersController {
     return await OrderItem.all()
   }
 
+  async deleteOrder({request}: HttpContext) {
+    const { user_id } = request.only(['user_id'])
+    let order = await Order.findBy('user_id', user_id)
+    if (order) {
+      await order.delete()
+      return 'Pedido deletado'
+    }
+
+  }
+
   async store ({request, response}: HttpContext) {
     // agora vamos usar transação, para garantir de que se alguma parte falhar, a transação será revertida e não feita pela metade
     const trx = await db.transaction()

@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
+import CartsController from './carts_controller.js'
 
 
 export default class AuthController {
@@ -8,7 +9,8 @@ export default class AuthController {
     const { email, password } = request.only(['email', 'password'])
     const user = await User.verifyCredentials(email, password)
     const token = await User.accessTokens.create(user)
-    //const tokenValue = token.toJSON().token
+    const cartsController = new CartsController()
+    cartsController.createCartLogin(user.id)
     return { user: this.getSafeUser(user), token: token.value!.release() }
   }
 
