@@ -132,19 +132,19 @@ export default class CartsController {
     // primeiro tratamos de obter o carrinho do usuário e o produto em questão
     const userId = auth.user?.id
     const { product_id } = request.only(['product_id'])
-    const cart = Cart.findByOrFail('user_id', userId) // preciso do cart.id pra deletar o item dele
+    const cart = await Cart.findByOrFail('user_id', userId) // preciso do cart.id pra deletar o item dele
 
     //achamos o item
     const cartItem = await CartItem.query()
-    .where('cart_id', (await cart).id)
+    .where('cart_id',  cart.id)
     .andWhere('product_id', product_id)
     .first();
     
     // atualizamos o valor do carrinho e removemos o item do carrinho
     if(cartItem){
-      (await cart).total -= cartItem.price * cartItem.quantity;
-      (await cart).save
-      cartItem.delete
+      cart.total -= cartItem.price * cartItem.quantity;
+      cart.save()
+      cartItem.delete()
       return { message: 'Item removido' };
     }
     return { message: 'Falha na remoção' };
