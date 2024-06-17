@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import app from '@adonisjs/core/services/app'
 import { deleteOldImage, extTypes, imgSize, usersImgsPath, usersImgsPublicPath, usersImgsUrl } from './exports.js'
+import Cart from '#models/cart'
 
 export default class UsersController {
   async indexall({}: HttpContext) {
@@ -123,6 +124,10 @@ export default class UsersController {
     const user: User | null = await User.find(params.id)
     if (user) {
       const imageDelPath = user.imageDelPath
+      let cart = await Cart.findBy('user_id', user.id)
+      if (cart) {
+        await cart.delete()
+      }
       await user.delete()
       deleteOldImage(imageDelPath)
       return 'Usuário deletado'

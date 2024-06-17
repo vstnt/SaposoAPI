@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Cart from '#models/cart'
 import CartItem from '#models/cart_item'
 import Product from '#models/product'
+import { TimestampKeywords } from '@adonisjs/core/types/logger'
 
 
 
@@ -43,8 +44,6 @@ export default class CartsController {
   async deleteCart({ request }: HttpContext) {
     const { user_id } = request.only(['user_id'])
     let cart = await Cart.findBy('user_id', user_id)
-    console.log(cart)
-    console.log(user_id)
     if (cart) {
       await cart.delete()
       return 'Carrinho deletado'
@@ -58,10 +57,11 @@ export default class CartsController {
     if (userId){
       try {
         const cart = await Cart.query().where('user_id', userId).preload('items').firstOrFail()
-        const items = cart.items.map((item: { productId: number; quantity: number; price: number }) => ({
+        const items = cart.items.map((item: { productId: number; quantity: number; price: number; createdAt: TimestampKeywords }) => ({
           productId: item.productId,
           quantity: item.quantity,
           price: item.price,
+          createdAt: new Date(item.createdAt).getTime(),
         }));
         return ({total:cart.total, items:items})
       } catch (error) {
