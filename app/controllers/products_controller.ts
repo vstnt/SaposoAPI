@@ -4,10 +4,13 @@ import app from '@adonisjs/core/services/app'
 import { deleteOldImage, extTypes, imgSize, productsImgsPath, productsImgsPublicPath, productsImgsUrl } from './exports.js'
 import db from '@adonisjs/lucid/services/db'
 
+
 export default class ProductsController {
+  
   async indexall({}: HttpContext) {
     return await Product.all()
   }
+
 
   async indexunit({ params }: HttpContext) {
     const product: Product | null = await Product.find(params.id)
@@ -17,29 +20,34 @@ export default class ProductsController {
     return product
   }
 
+
   async store({ request, response }: HttpContext) {
     const images = request.files('image', {
       size: imgSize,
       extnames: extTypes,
     })
 
-    // checa se tem só uma imagem
+    // checa se não há mais de uma imagem
     if (images.length > 1) {
       return response.status(400).send('Envie apenas uma imagem para o produto.')
     }
     const image = images[0]
 
+    // caso não exista imagem
     if (!image) {
-      await Product.create(request.all())
+      await Product.create(request.all()) // falta a validação pra uma imagem por url.
       return 'Inserção de produto realizada'
     }
 
-    if (!image.hasErrors) {
+    // há uma imagem. Ela tem erros?
+    if (image.hasErrors) {
+      return response.status(400).send(image.errors)
+    } else { // imagem sem erros. Há também uma url de imagem?
       if (request.input('imageUrl')) {
         return 'Inserir apenas uma URL ou arquivo de imagem.'
       }
 
-      // chegamos aqui caso contenha img, validada e sem erros
+      // Há uma img, validada e sem erros
       const imageName = `${new Date().getTime()}.${image.extname}`
       const imageUrl = `${productsImgsUrl}${imageName}`
       const imageDelPath = `${productsImgsPath}${imageName}`
@@ -47,20 +55,18 @@ export default class ProductsController {
       await Product.create({ ...productData, imageUrl, imageDelPath })
       await image.move(app.publicPath(`${productsImgsPublicPath}`), { name: imageName })
 
-      return 'Inserção de produto realizada'
-    } else {
-      return response.status(400).send(image.errors)
-    }
+      return 'Inserção de produto realizada'    }
   }
 
+
   async update({ params, request, response }: HttpContext) {
-    // lembre que, para limpar qualquer campo do produto, basta enviar a key com value vazio, null.
+    // Para limpar qualquer campo do produto, basta enviar a key com value vazio, null.
     // primeiro recolhemos a imagem. Caso exista, validamos quantidade, tipo, tamanho.
     const images = request.files('image', {
       size: imgSize,
       extnames: extTypes,
     })
-    // checa se tem só uma imagem
+    // checa se não há mais de uma imagem
     if (images.length > 1) {
       return response.status(400).send('Por favor, envie apenas uma imagem para o produto.')
     }
@@ -71,12 +77,13 @@ export default class ProductsController {
       return 'Produto não encontrado'
     }
 
+    // atualizamos os dados do produto, depois a imagem
     product.name = request.input('name')
     product.description = request.input('description')
     product.price = request.input('price')
     product.quantity = request.input('quantity')
 
-    if (!image && request.input('imageUrl')) {
+    if (!image && request.input('imageUrl')) { // há apenas uma url de imagem
       const imageDelPath = product.imageDelPath
       product.imageUrl = request.input('imageUrl')
       await product?.save()
@@ -85,31 +92,23 @@ export default class ProductsController {
       return 'Produto atualizado'
     }
 
-    // existe uma imagem, sem erros, com erros
-    if (image && !image.hasErrors) {
-      // tem imagem, mas tbm tem URL de imagem
-      if (request.input('imageUrl')) {
+    // existe uma imagem, ela tem erros?
+    if (image && image.hasErrors) {
+      return response.status(400).send(image.errors)
+    } else if (image && !image.hasErrors) { // a imagem não tem erros
+      if (request.input('imageUrl')) { // há também uma url de imagem?
         return 'Inserir apenas uma URL ou arquivo de imagem.'
       }
-
-      // tem apenas a imagem, validada
+      // temos apenas a imagem, validada
       const imageName = `${new Date().getTime()}.${image.extname}`
       product.imageUrl = `${productsImgsUrl}${imageName}`
-      // recuperamos o caminho da imagem antiga, para deleção
-      const imageDelPath = product.imageDelPath
-      // atualizamos o caminho de deleção para a nova imagem
-      product.imageDelPath = `${productsImgsPath}${imageName}`
+      const imageDelPath = product.imageDelPath // recuperamos o caminho da imagem antiga, para deleção
+      product.imageDelPath = `${productsImgsPath}${imageName}` // atualizamos o caminho de deleção para a nova imagem
+
       await product?.save()
       await image.move(app.publicPath(`${productsImgsPublicPath}`), { name: imageName })
-      // deletamos a img anterior, caso esteja no back-end
-      deleteOldImage(imageDelPath)
-
+      deleteOldImage(imageDelPath) // deletamos a img anterior, caso esteja no back-end
       return 'Produto atualizado'
-    } else {
-      // situação de img com erros
-      if (image && image.hasErrors) {
-        return response.status(400).send(image.errors)
-      }
     }
 
     // save para o caso sem alterações de imagem
@@ -117,7 +116,8 @@ export default class ProductsController {
     return 'Produto atualizado'
   }
 
-  async destroy({ params }: HttpContext) {
+
+  async delete({ params }: HttpContext) {
     const product: Product | null = await Product.find(params.id)
     if (product) {
       const imageDelPath = product.imageDelPath
@@ -127,6 +127,7 @@ export default class ProductsController {
     }
     return 'Produto não encontrado'
   }
+
 
   async topSelling({ response }: HttpContext) {
     const products = await db
@@ -141,6 +142,7 @@ export default class ProductsController {
     return response.json(products)
   }
 
+
   async newest({ response }: HttpContext) {
     const products = await Product.query()
       .orderBy('createdAt', 'desc')
@@ -149,9 +151,9 @@ export default class ProductsController {
     return response.json(products)
   }
 
+  
   async search({ request, response }: HttpContext) {
     const { term, category } = request.qs()
-
     const query = Product.query()
 
     if (term) {

@@ -22,10 +22,10 @@ router.post('/api/logout', [AuthController, 'logout']).use(middleware.auth({guar
 
 // Usuários e registro
 router.get('/api/users', [UsersController, 'indexall'])
-router.post('/api/register', [UsersController, 'store'])
 router.get('/api/users/:id', [UsersController, 'indexunit'])
+router.post('/api/register', [UsersController, 'register'])
 router.put('/api/users/:id', [UsersController, 'update'])
-router.delete('/api/users/:id', [UsersController, 'destroy'])
+router.delete('/api/users/:id', [UsersController, 'delete'])
 
 // Produtos
 router.get('/api/products', [ProductsController, 'indexall'])
@@ -34,7 +34,7 @@ router.get('/api/products/newest', [ProductsController, 'newest'])
 router.get('/api/products/search', [ProductsController, 'search'])
 router.get('/api/products/:id', [ProductsController, 'indexunit'])
 router.put('/api/products/:id', [ProductsController, 'update'])
-router.delete('/api/products/:id', [ProductsController, 'destroy'])
+router.delete('/api/products/:id', [ProductsController, 'delete'])
 router.get('/api/products/top-selling', [ProductsController, 'topSelling'])
 
 // Pedidos

@@ -8,7 +8,6 @@ import { TimestampKeywords } from '@adonisjs/core/types/logger'
 
 export default class CartsController {
  
-  
   async indexCarts({}: HttpContext) {
     return await Cart.all()
   }
@@ -73,7 +72,7 @@ export default class CartsController {
   }
 
 
-  // esse aqui serve pra adicionar e retirar quantidades variadas de um item do carrinho
+  // método para adicionar e retirar quantidades variadas de um item do carrinho
   async updateItem({ request, auth }: HttpContext){
     try {
       // primeiro tratamos de obter o carrinho do usuário, o produto em questão e a quantidade alterada no carrinho.
@@ -101,18 +100,20 @@ export default class CartsController {
           productId: product.id,
           quantity: itemQuantity,
           price: product.price
-        }) 
+        })
+      
       // se já está, atualizamos a quantidade no carrinho
       } else { 
         existingItem.quantity += itemQuantity
-        existingItem.price = product.price
+        existingItem.price = product.price // atualizamos o preço de acordo com o preço do produto na db, e não do valor do item no carrinho! Isso dá segurança.
         if(existingItem.quantity <= 0) { // se a quantidade de items ficar negativa ou igual a 0, excluímos o item do carrinho
           existingItem.delete()
         } else {
           await existingItem.save();
         }
       }
-      // por fim, atualizamos o valor total do carrinho
+
+      // por fim, atualizamos o valor total do carrinho (sempre contando todos os valores, e não utilizando o total anterior)
       const cartItems = await CartItem.query().where('cartId', cart.id);
       cart.total = cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
       await cart.save()
@@ -140,7 +141,7 @@ export default class CartsController {
     .andWhere('product_id', product_id)
     .first();
     
-    // atualizamos o valor do carrinho e removemos o item do carrinho
+    // atualizamos o valor do carrinho e removemos o item
     if(cartItem){
       cart.total -= cartItem.price * cartItem.quantity;
       cart.save()

@@ -4,6 +4,16 @@ import CartsController from './carts_controller.js'
 
 
 export default class AuthController {
+  
+  //aqui tratamos de reduzir os dados de usuário enviados ao front
+  private getSafeUser(user: User) {
+    return {
+      id: user.id,
+      name: user.fullName,
+      email: user.email,
+    }
+  }
+
 
   async signin({ request }: HttpContext) {
     const { email, password } = request.only(['email', 'password'])
@@ -14,6 +24,7 @@ export default class AuthController {
     return { user: this.getSafeUser(user), token: token.value!.release() }
   }
 
+
   async validateToken({ auth }: HttpContext) {
     const user = auth.user
     if (!user) {
@@ -23,24 +34,17 @@ export default class AuthController {
     return { user: this.getSafeUser(user) }
   }
 
+
   async logout({ auth }: HttpContext) {
     const user = auth.user
     const token = user?.currentAccessToken
-
 
     if (user && token) {
       await User.accessTokens.delete(user, token.identifier)
       return { status: true }
     }
+    
     return 'erro de deleção de token'
-  }
-
-  private getSafeUser(user: User) { //aqui tratamos de reduzir os dados de usuário enviados ao front
-    return {
-      id: user.id,
-      name: user.fullName,
-      email: user.email,
-    }
   }
 }
 
