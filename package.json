@@ -51,11 +51,13 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@adonisjs/auth": "^9.2.1",
+    "@adonisjs/ally": "^5.0.2",
+    "@adonisjs/auth": "^9.2.3",
     "@adonisjs/core": "^6.9.0",
     "@adonisjs/cors": "^2.2.1",
     "@adonisjs/lucid": "^20.6.0",
     "@adonisjs/static": "^1.1.1",
+    "@adonisjs/validator": "^13.0.2",
     "@vinejs/vine": "^2.0.0",
     "bignumber.js": "^9.1.2",
     "luxon": "^3.4.4",
