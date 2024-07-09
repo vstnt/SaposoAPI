@@ -1,3 +1,5 @@
+// aguardando para deleção
+
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {

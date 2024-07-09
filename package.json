@@ -58,8 +58,10 @@
     "@adonisjs/lucid": "^20.6.0",
     "@adonisjs/static": "^1.1.1",
     "@adonisjs/validator": "^13.0.2",
+    "@types/jsonwebtoken": "^9.0.6",
     "@vinejs/vine": "^2.0.0",
     "bignumber.js": "^9.1.2",
+    "jsonwebtoken": "^9.0.2",
     "luxon": "^3.4.4",
     "pg": "^8.11.5",
     "reflect-metadata": "^0.2.2"

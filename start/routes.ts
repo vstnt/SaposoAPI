@@ -17,8 +17,12 @@ router.get('/', async () => {
 
 // Autenticação de usuário
 router.post('/api/signin', [AuthController, 'signin'])
+/* alterado para JWT
 router.post('/api/validate', [AuthController, 'validateToken']).use(middleware.auth({guards: ['api']}))
-router.post('/api/logout', [AuthController, 'logout']).use(middleware.auth({guards: ['api']}))
+router.post('/api/logout', [AuthController, 'logout']).use(middleware.auth({guards: ['api']})) */
+router.post('/api/validate', [AuthController, 'validateToken']).use(middleware.auth())
+router.post('/api/refreshtoken', [AuthController, 'refreshToken'])
+router.post('/api/logout', [AuthController, 'logout']).use(middleware.auth())
 
 // Usuários e registro
 router.get('/api/users', [UsersController, 'indexall'])
@@ -54,7 +58,12 @@ router.get('api/cartsitems', [CartsController, 'indexCartsItems'])
 router.post('api/carts/create', [CartsController, 'createCart'])
 router.post('api/carts/delete', [CartsController, 'deleteCart'])
 
+/* alterado para JWT
 router.get('api/cart', [CartsController, 'viewCart']).use(middleware.auth({guards: ['api']}))
 router.post('api/cart/updateitem', [CartsController, 'updateItem']).use(middleware.auth({guards: ['api']}))
 router.post('api/cart/deleteitem', [CartsController, 'deleteItem']).use(middleware.auth({guards: ['api']}))
-router.get('api/cart/clear', [CartsController, 'clearCart']).use(middleware.auth({guards: ['api']}))
+router.get('api/cart/clear', [CartsController, 'clearCart']).use(middleware.auth({guards: ['api']})) */
+router.get('api/cart', [CartsController, 'viewCart']).use(middleware.auth())
+router.post('api/cart/updateitem', [CartsController, 'updateItem']).use(middleware.auth())
+router.post('api/cart/deleteitem', [CartsController, 'deleteItem']).use(middleware.auth())
+router.get('api/cart/clear', [CartsController, 'clearCart']).use(middleware.auth())
