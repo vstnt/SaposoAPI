@@ -7,13 +7,19 @@ import UsersController from '#controllers/users_controller'
 import CartsController from '#controllers/carts_controller'
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
+import redis from '@adonisjs/redis/services/main'
+
+router.get('/test-redis', async ({ response }) => {
+  await redis.set('test', 'working')
+  const value = await redis.get('test')
+  return response.json({ value })
+})
 
 router.get('/', async () => {
   return {
     hello: 'world',
   }
 })
-
 
 // Autenticação de usuário
 router.post('/api/signin', [AuthController, 'signin'])
@@ -22,6 +28,8 @@ router.post('/api/validate', [AuthController, 'validateToken']).use(middleware.a
 router.post('/api/logout', [AuthController, 'logout']).use(middleware.auth({guards: ['api']})) */
 router.post('/api/validate', [AuthController, 'validateToken']).use(middleware.auth())
 router.post('/api/refreshtoken', [AuthController, 'refreshToken'])
+router.get('/api/refreshtokenindex', [AuthController, 'indexRefreshToken'])
+router.delete('/api/refreshtokendelete/:id', [AuthController, 'delete'])
 router.post('/api/logout', [AuthController, 'logout']).use(middleware.auth())
 
 // Usuários e registro

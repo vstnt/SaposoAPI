@@ -21,8 +21,8 @@ export default class AuthController {
     const { email, password } = request.only(['email', 'password'])
     const user = await User.verifyCredentials(email, password)
     //const token = await User.accessTokens.create(user) alterado para JWT, mas é reutilizado para fazer os refresh tokens!
-    const accessToken = await auth.use('jwt').generate(user, '30s') // ex:(user, 10m) para não usar o tempo de expiração padrão de auth/guards/jwt.ts
-    const refreshToken = await User.refreshTokens.create(user, ['*'], { expiresIn: '1m' })
+    const accessToken = await auth.use('jwt').generate(user, '120s') // ex:(user, 10m) para não usar o tempo de expiração padrão de auth/guards/jwt.ts
+    const refreshToken = await User.refreshTokens.create(user, ['*'], { expiresIn: '5m' })
     const cartsController = new CartsController()
     cartsController.createCartLogin(user.id)
     //return { user: this.getSafeUser(user), token: token.value!.release() } alterado para JWT
@@ -42,14 +42,19 @@ export default class AuthController {
 
   async logout({ request, auth }: HttpContext) { // falta adicionar o token de acesso à lista de revogados
     const user = auth.user
-    const { refresh_token } = request.only(['refresh_token'])
+    const refresh_token = request.header('refresh_token')
 
-    if (user && refresh_token) {
-      await RefreshToken.query().where('user_id', user.id).where('hash', refresh_token).delete()
-      return Response.json({ message: 'Logged out successfully' })
+    if (user) {
+
+      // logica do redis
+      if (refresh_token) {
+        await RefreshToken.query().where('tokenable_id', user.id).where('hash', refresh_token).delete()
+        return 'Logged out successfully com refresh token'
+      }
+      return 'Logged out successfully sem refresh token'
 
     }
-    return 'erro de deleção de token'
+    return 'erro de logout'
     /* const token = user?.currentAccessToken   método antigo que utilizava tokens de db
 
     if (user && token) {
@@ -65,7 +70,8 @@ export default class AuthController {
 
   // método de rota a ser chamada pelo front quando o access token expira
   async refreshToken({ request, auth }: HttpContext) {
-    const { refresh_token } = request.only(['refresh_token'])
+    const refresh_token = request.header('refresh_token')
+    if (!refresh_token || refresh_token == undefined){return 'Refresh token not obtained at controller'}
 
     // encontramos o refresh token, aproveitando pra checar se ele não expirou.
     const storedToken = await RefreshToken.query()
@@ -88,6 +94,21 @@ export default class AuthController {
     await storedToken.delete()
     return { user: this.getSafeUser(user), token: newAccessToken.token, refreshToken: newRefreshToken.hash }
   }
+
+  async indexRefreshToken({}: HttpContext) {
+    return await RefreshToken.all()
+  }
+
+  async delete({ params }: HttpContext) {
+    const refreshToken = await RefreshToken.find(params.id)
+    if (refreshToken) {
+      await refreshToken.delete()
+      return 'refreshToken deletado'
+    }
+    return 'refreshToken não encontrado'
+  }
+
+  
 
 }
 
