@@ -26,7 +26,7 @@ router.post('/api/signin', [AuthController, 'signin'])
 /* alterado para JWT
 router.post('/api/validate', [AuthController, 'validateToken']).use(middleware.auth({guards: ['api']}))
 router.post('/api/logout', [AuthController, 'logout']).use(middleware.auth({guards: ['api']})) */
-router.post('/api/validate', [AuthController, 'validateToken']).use(middleware.auth())
+router.post('/api/validate', [AuthController, 'validateToken']).use([middleware.auth(), middleware.checkRevokedToken()])
 router.post('/api/refreshtoken', [AuthController, 'refreshToken'])
 router.get('/api/refreshtokenindex', [AuthController, 'indexRefreshToken'])
 router.delete('/api/refreshtokendelete/:id', [AuthController, 'delete'])

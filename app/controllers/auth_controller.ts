@@ -3,6 +3,7 @@ import User from '#models/user'
 import CartsController from './carts_controller.js'
 import RefreshToken from '#models/refresh_token'
 import { DateTime } from 'luxon'
+import redis from '@adonisjs/redis/services/main'
 
 
 export default class AuthController {
@@ -21,7 +22,7 @@ export default class AuthController {
     const { email, password } = request.only(['email', 'password'])
     const user = await User.verifyCredentials(email, password)
     //const token = await User.accessTokens.create(user) alterado para JWT, mas é reutilizado para fazer os refresh tokens!
-    const accessToken = await auth.use('jwt').generate(user, '120s') // ex:(user, 10m) para não usar o tempo de expiração padrão de auth/guards/jwt.ts
+    const accessToken = await auth.use('jwt').generate(user, '10s') // ex:(user, 10m) para não usar o tempo de expiração padrão de auth/guards/jwt.ts
     const refreshToken = await User.refreshTokens.create(user, ['*'], { expiresIn: '5m' })
     const cartsController = new CartsController()
     cartsController.createCartLogin(user.id)
@@ -39,22 +40,28 @@ export default class AuthController {
     return { user: this.getSafeUser(user) }
   }
 
+  async revokeAccessToken(token: string) {
+    const expiresAt = DateTime.now().plus({ minutes: 15 }).toSeconds()  // Ajuste o tempo de expiração conforme necessário
+    await redis.set(`revoked_token:${token}`, 'true', 'EX', Math.ceil(expiresAt))
+  }
 
   async logout({ request, auth }: HttpContext) { // falta adicionar o token de acesso à lista de revogados
     const user = auth.user
+    const token = request.header('authorization')?.split('Bearer ')
     const refresh_token = request.header('refresh_token')
 
     if (user) {
-
-      // logica do redis
+      if(token){
+        this.revokeAccessToken(token[1])
+      }
       if (refresh_token) {
         await RefreshToken.query().where('tokenable_id', user.id).where('hash', refresh_token).delete()
-        return 'Logged out successfully com refresh token'
+        return { status: true, message:'Logged out successfully com refresh token' }
       }
-      return 'Logged out successfully sem refresh token'
+      return { status: true, message:'Logged out successfully sem refresh token' }
 
     }
-    return 'erro de logout'
+    return 'erro de logout, usuário não encontrado'
     /* const token = user?.currentAccessToken   método antigo que utilizava tokens de db
 
     if (user && token) {
@@ -64,7 +71,6 @@ export default class AuthController {
     
     return 'erro de deleção de token'
         */
-   return { status: true }
   }
 
 
@@ -95,9 +101,11 @@ export default class AuthController {
     return { user: this.getSafeUser(user), token: newAccessToken.token, refreshToken: newRefreshToken.hash }
   }
 
+
   async indexRefreshToken({}: HttpContext) {
     return await RefreshToken.all()
   }
+
 
   async delete({ params }: HttpContext) {
     const refreshToken = await RefreshToken.find(params.id)
