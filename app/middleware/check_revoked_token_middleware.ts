@@ -15,17 +15,14 @@ export default class CheckRevokedTokenMiddleware {
       return (ctx.response.send('sem token no middleware CheckRevokedToken'))
     }
 
-    console.log('token recuperado no middleware: ', token[1])
     const isRevoked = await redis.get(`revoked_token:${token[1]}`)
     if (isRevoked) {
-      console.log('token encontrado no redis: ', isRevoked)
       return (ctx.response.send('Token has been revoked'))
     }
 
     /**
      * Call next method in the pipeline and return its output
      */
-    console.log('Token não revogado passando do middleware.')
     const output = await next()
     return output
   }

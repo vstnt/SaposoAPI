@@ -71,7 +71,7 @@ router.get('api/cart', [CartsController, 'viewCart']).use(middleware.auth({guard
 router.post('api/cart/updateitem', [CartsController, 'updateItem']).use(middleware.auth({guards: ['api']}))
 router.post('api/cart/deleteitem', [CartsController, 'deleteItem']).use(middleware.auth({guards: ['api']}))
 router.get('api/cart/clear', [CartsController, 'clearCart']).use(middleware.auth({guards: ['api']})) */
-router.get('api/cart', [CartsController, 'viewCart']).use(middleware.auth())
+router.get('api/cart', [CartsController, 'viewCart']).use([middleware.auth(), middleware.checkRevokedToken()])
 router.post('api/cart/updateitem', [CartsController, 'updateItem']).use(middleware.auth())
 router.post('api/cart/deleteitem', [CartsController, 'deleteItem']).use(middleware.auth())
 router.get('api/cart/clear', [CartsController, 'clearCart']).use(middleware.auth())
