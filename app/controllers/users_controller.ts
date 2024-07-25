@@ -84,6 +84,7 @@ export default class UsersController {
     // Checamos se há apenas uma imagem
     if (images.length > 1) {
       return response.status(400).send('Por favor, envie apenas uma imagem para o usuário.')
+
     }
     const image = images[0]
 
