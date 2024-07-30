@@ -5,5 +5,19 @@
     "outDir": "./build",
     "esModuleInterop": true,
     "resolveJsonModule": true,
+
+    // daqui para baixo foram adições sugeridas pelo gpt, para tentarmos resolver o problema de módulo ts-node não encontrado, além de alteração no ace.js
+    "module": "ESNext",
+    "target": "ES2020",
+    "lib": ["ESNext"],
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "strict": true,
+    "baseUrl": ".", // Base URL para resolver módulos
+    "paths": {
+      "*": ["node_modules/*"]
+    }
   },
+  "include": ["app/**/*", "start/**/*", "ace.ts", "bin/**/*", "config/**/*", "database/**/*"], // Inclui todos os diretórios relevantes
+  "exclude": ["node_modules", "build", "public"]
 }
