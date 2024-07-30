@@ -38,12 +38,16 @@ export default class UsersController {
     }
     const image = images[0]
 
-    if (!image) {
+    if (!image) { // alterado firebase
       try {
-        await User.create(request.all())
+        const user = await User.create(request.all())
+        if (request.input('source') == 'backend') {
+          user.uid = user.id.toString()
+          await user.save()
+        }
         return 'Inserção de usuário realizada'
       } catch (error) {
-        return (error)
+        return response.status(400).send(error)
       }
 
     }
@@ -145,10 +149,10 @@ export default class UsersController {
 
 
   async delete({ params }: HttpContext) {
-    const user: User | null = await User.find(params.id)
+    const user: User | null = await User.find(params.uid)
     if (user) {
       const imageDelPath = user.imageDelPath
-      let cart = await Cart.findBy('user_id', user.id)
+      let cart = await Cart.findBy('uid', user.uid)
       if (cart) {
         await cart.delete()
       }

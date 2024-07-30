@@ -18,31 +18,32 @@ export default class CartsController {
   }
 
 
-  // chamado a cada login, pelo controlador do login (authController)
-  async createCartLogin(userId: number) {
+  // chamado a cada login de contas do backend, pelo controlador do login (authController)
+  async createCartLogin(uid: string) {
     // Verifica se o usuário já tem um carrinho
-    let cart = await Cart.findBy('user_id', userId)
+    let cart = await Cart.findBy('uid', uid)
     if (!cart){
       //cria um novo carrinho
-      cart = await Cart.create({userId: userId, total: 0})
+      cart = await Cart.create({uid: uid, total: 0})
     }
     return cart
   }
 
 
   async createCart({ request }: HttpContext) {
-    const { user_id } = request.only(['user_id'])
-    let cart = await Cart.findBy('user_id', user_id)
+    console.log('createCart chamado')
+    const { uid } = request.only(['uid'])
+    let cart = await Cart.findBy('uid', uid)
     if (!cart){
-      await Cart.create({userId: user_id, total: 10})
+      await Cart.create({uid: uid, total: 0})
     }
     return 'Carrinho criado'
   }
 
 
   async deleteCart({ request }: HttpContext) {
-    const { user_id } = request.only(['user_id'])
-    let cart = await Cart.findBy('user_id', user_id)
+    const { uid } = request.only(['uid'])
+    let cart = await Cart.findBy('uid', uid)
     if (cart) {
       await cart.delete()
       return 'Carrinho deletado'
@@ -52,10 +53,10 @@ export default class CartsController {
 
   // método pra vizualizar o carrinho do usuário
   async viewCart({ auth }: HttpContext){
-    const userId = auth.user?.id
-    if (userId){
+    const uid = auth.user?.uid
+    if (uid){
       try {
-        const cart = await Cart.query().where('user_id', userId).preload('items').firstOrFail()
+        const cart = await Cart.query().where('uid', uid).preload('items').firstOrFail()
         const items = cart.items.map((item: { productId: number; quantity: number; price: number; createdAt: TimestampKeywords }) => ({
           productId: item.productId,
           quantity: item.quantity,
@@ -76,12 +77,12 @@ export default class CartsController {
   async updateItem({ request, auth }: HttpContext){
     try {
       // primeiro tratamos de obter o carrinho do usuário, o produto em questão e a quantidade alterada no carrinho.
-      const userId = auth.user?.id
+      const uid = auth.user?.uid
       const { product_id, quantity } = request.only(['product_id', 'quantity'])
       const itemQuantity = parseInt(quantity, 10); // transformamos em int e o 10 serve pra caso o valor venha como 002 por exemplo, pra ficar em base 10
       if (itemQuantity == 0) { return { message: 'Insira uma quantidade diferente de zero para o produto'} }
       if (isNaN(itemQuantity)) { return { message: 'Quantidade inválida' } }
-      const cart = await Cart.findByOrFail('user_id', userId)
+      const cart = await Cart.findByOrFail('uid', uid)
       const product = await Product.findOrFail(product_id)
 
       // então checamos se o item já não está no carrinho
@@ -131,9 +132,9 @@ export default class CartsController {
 
   async deleteItem({ request, auth }: HttpContext){
     // primeiro tratamos de obter o carrinho do usuário e o produto em questão
-    const userId = auth.user?.id
+    const uid = auth.user?.uid
     const { product_id } = request.only(['product_id'])
-    const cart = await Cart.findByOrFail('user_id', userId) // preciso do cart.id pra deletar o item dele
+    const cart = await Cart.findByOrFail('uid', uid) // preciso do cart.id pra deletar o item dele
 
     //achamos o item
     const cartItem = await CartItem.query()
@@ -153,10 +154,10 @@ export default class CartsController {
 
 
   async clearCart({ auth }: HttpContext) {
-    const userId = auth.user?.id;
-    if (userId) {
+    const uid = auth.user?.uid;
+    if (uid) {
       try {
-        const cart = await Cart.query().where('user_id', userId).preload('items').firstOrFail();
+        const cart = await Cart.query().where('uid', uid).preload('items').firstOrFail();
         await cart.related('items').query().delete();
         cart.total = 0
         cart.save()

@@ -3,6 +3,7 @@ import { symbols, errors } from '@adonisjs/auth'
 import { AuthClientResponse, GuardContract } from '@adonisjs/auth/types'
 import jwt from 'jsonwebtoken'
 import type { HttpContext } from '@adonisjs/core/http'
+import admin from '#start/firebaseAdmin'
 
 
 // The bridge between the User provider and the Guard
@@ -89,24 +90,40 @@ export class JwtGuard<UserProvider extends JwtUserProviderContract<unknown>>
       })
     }
 
-    // Verify token
-    const payload = jwt.verify(token, this.#options.secret)
-    if (typeof payload !== 'object' || !('userId' in payload)) {
-      throw new errors.E_UNAUTHORIZED_ACCESS('Unauthorized access', {
-        guardDriverName: this.driverName,
-      })
-    }
+    // Verify token source
+    const tokenOrigin = this.#ctx.request.header('tokenOrigin')
 
-    // Fetch the user by user ID and save a reference to it
-    const providerUser = await this.#userProvider.findById(payload.userId)
-    if (!providerUser) {
-      throw new errors.E_UNAUTHORIZED_ACCESS('Unauthorized access', {
-        guardDriverName: this.driverName,
-      })
-    }
+    if (tokenOrigin == 'firebase') {
+      try {
+        const firebaseUser = await admin.auth().verifyIdToken(token)
+        this.user = { uid: firebaseUser.uid, source: 'firebase' } as UserProvider[typeof symbols.PROVIDER_REAL_USER] // ???
+        return this.getUserOrFail() // ???
+      } catch (error) {
+        throw new errors.E_UNAUTHORIZED_ACCESS('Unauthorized access', {
+          guardDriverName: this.driverName,
+        })
+      }
 
-    this.user = providerUser.getOriginal()
-    return this.getUserOrFail()
+    } else {
+      // Verify JWT token
+      const payload = jwt.verify(token, this.#options.secret)
+      if (typeof payload !== 'object' || !('userId' in payload)) {
+        throw new errors.E_UNAUTHORIZED_ACCESS('Unauthorized access', {
+          guardDriverName: this.driverName,
+        })
+      }
+
+      // Fetch the user by user ID and save a reference to it
+      const providerUser = await this.#userProvider.findById(payload.userId)
+      if (!providerUser) {
+        throw new errors.E_UNAUTHORIZED_ACCESS('Unauthorized access', {
+          guardDriverName: this.driverName,
+        })
+      }
+
+      this.user = providerUser.getOriginal()
+      return this.getUserOrFail()
+    }
   }
 
 

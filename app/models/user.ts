@@ -15,19 +15,25 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare id: number
 
   @column()
+  declare uid: string
+
+  @column()
+  declare source: string
+
+  @column()
   declare fullName: string | null
 
   @column()
   declare email: string
 
   @column()
-  declare password: string
+  declare password: string | null
 
   @column()
-  declare imageUrl: string
+  declare imageUrl: string | null
 
   @column()
-  declare imageDelPath: string
+  declare imageDelPath: string | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -36,7 +42,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare updatedAt: DateTime | null
 
   static refreshTokens = DbAccessTokensProvider.forModel(User, {
-    expiresIn: '120s',
+    expiresIn: '15m',
     table: 'refresh_tokens',
   })
 }

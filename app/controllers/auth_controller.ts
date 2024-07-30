@@ -22,14 +22,13 @@ export default class AuthController {
     const { email, password } = request.only(['email', 'password'])
     const user = await User.verifyCredentials(email, password)
     //const token = await User.accessTokens.create(user) alterado para JWT, mas é reutilizado para fazer os refresh tokens!
-    const accessToken = await auth.use('jwt').generate(user, '10s') // ex:(user, 10m) para não usar o tempo de expiração padrão de auth/guards/jwt.ts
-    const refreshToken = await User.refreshTokens.create(user, ['*'], { expiresIn: '15s' })
+    const accessToken = await auth.use('jwt').generate(user, '30m') // ex:(user, 10m) para não usar o tempo de expiração padrão de auth/guards/jwt.ts
+    const refreshToken = await User.refreshTokens.create(user, ['*'], { expiresIn: '30d' })
     const cartsController = new CartsController()
-    cartsController.createCartLogin(user.id)
+    cartsController.createCartLogin(user.uid)
     //return { user: this.getSafeUser(user), token: token.value!.release() } alterado para JWT
     return { user: this.getSafeUser(user), token: accessToken.token, refreshToken: refreshToken.hash }
   }
-
 
   async validateToken({ auth }: HttpContext) {
     const user = auth.user
@@ -77,7 +76,6 @@ export default class AuthController {
 
   // método de rota a ser chamada pelo front quando o access token expira
   async refreshToken({ request, auth, response }: HttpContext) {
-    console.log('refresh token chamado uma vez')
     const refresh_token = request.header('refresh_token')
     if (!refresh_token || refresh_token == undefined){
       return response.status(400).json({ message: 'Refresh token not obtained at controller' })
@@ -100,12 +98,10 @@ export default class AuthController {
     }
 
     await storedToken.delete()
-    console.log('refresh token recebido deletado')
 
     // lhe fornecemos novos token de acesso e token de atualização, e deletamos o token de atualização utilizado
-    const newAccessToken = await auth.use('jwt').generate(user, '10s')
-    const newRefreshToken = await User.refreshTokens.create(user, ['*'], { expiresIn: '15s' })
-    console.log('enviando novo accesstoken e refreshtoken')
+    const newAccessToken = await auth.use('jwt').generate(user, '30m')
+    const newRefreshToken = await User.refreshTokens.create(user, ['*'], { expiresIn: '30d' })
     return { user: this.getSafeUser(user), token: newAccessToken.token, refreshToken: newRefreshToken.hash }
   }
 

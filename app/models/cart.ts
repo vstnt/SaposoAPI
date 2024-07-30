@@ -7,7 +7,7 @@ export default class Cart extends BaseModel {
   declare id: number
 
   @column()
-  declare userId: number
+  declare uid: string
 
   @column()
   declare total: number
