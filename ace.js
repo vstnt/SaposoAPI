@@ -21,7 +21,9 @@
  */
 //import { register } from 'node:module'
 //register('ts-node/esm', import.meta.url)
-import 'ts-node/register';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+require('ts-node/register');
 
 /*A abordagem anterior está tentando usar o módulo nativo node:module para registrar
  o ts-node/esm. O problema aqui é que a API de módulos do Node.js pode não estar
