@@ -17,7 +17,7 @@ router.get('/test-redis', async ({ response }) => {
 
 router.get('/', async () => {
   return {
-    hello: 'world',
+    hello: 'Jao, mama aqui',
   }
 })
 
