@@ -11,6 +11,11 @@ tmp
 
 # Frontend assets compiled code
 public/assets
+public/uploads/productsImgs
+public/uploads/usersImgs
+
+# firebaseAdmin config
+start/firebaseAdmin.ts
 
 # Build tools specific
 npm-debug.log

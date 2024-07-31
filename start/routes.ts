@@ -22,6 +22,7 @@ router.get('/', async () => {
   }
 })
 
+// endpoint protegido por chave secreta para rodar as migrations
 router.post('/run-migrations', async ({ request, response }) => {
   const secret = request.input('secret')
 

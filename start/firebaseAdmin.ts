@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
-//import serviceAccount from '../../../FirebaseAdminSDKCredentials/serviceAccountKey.json' assert { type: 'json' };
-import serviceAccount from '/etc/secrets/serviceAccountKey.json' assert { type: 'json' };
+import serviceAccount from '../../../FirebaseAdminSDKCredentials/serviceAccountKey.json' assert { type: 'json' };
+//import serviceAccount from '/etc/secrets/serviceAccountKey.json' assert { type: 'json' };
 
 
 // Tipar explicitamente o objeto de credenciais
