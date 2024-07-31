@@ -8,7 +8,6 @@ import CartsController from '#controllers/carts_controller'
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 import redis from '@adonisjs/redis/services/main'
-import { Env } from '@adonisjs/core/env'
 import { exec } from 'child_process'
 
 router.get('/test-redis', async ({ response }) => {
