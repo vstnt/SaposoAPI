@@ -8,6 +8,8 @@ import CartsController from '#controllers/carts_controller'
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 import redis from '@adonisjs/redis/services/main'
+import { Env } from '@adonisjs/core/env'
+import { exec } from 'child_process'
 
 router.get('/test-redis', async ({ response }) => {
   await redis.set('test', 'working')
@@ -20,6 +22,24 @@ router.get('/', async () => {
     hello: 'world',
   }
 })
+
+router.post('/run-migrations', async ({ request, response }) => {
+  const secret = request.input('secret')
+
+  if (secret !== process.env.MIGRATION_SECRET) {
+    return response.unauthorized('Invalid secret')
+  }
+
+  exec('node ace migration:run --force', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error: ${stderr}`)
+      return response.internalServerError('Migration failed')
+    }
+    console.log(`Success: ${stdout}`)
+    return response.ok('Migrations ran successfully')
+  })
+})
+
 
 // Autenticação de usuário
 router.post('/api/signin', [AuthController, 'signin'])
