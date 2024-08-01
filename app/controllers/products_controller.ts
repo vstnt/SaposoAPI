@@ -58,6 +58,23 @@ export default class ProductsController {
       return 'Inserção de produto realizada'    }
   }
 
+  async storelot({request, response}: HttpContext) {
+    const { products } = request.only(['products']);
+    
+    if (products && Array.isArray(products)) {
+      try {
+        products.forEach(product =>
+          Product.create({...product})
+        )
+        return 'Inserção de produtos realizada.'
+      } catch (error) {
+        return response.status(400).send('Erro ao inserir produtos: ', error)
+      }
+    } else {
+      return response.status(400).send('Erro: insira um array de produtos')
+    } 
+  }
+
 
   async update({ params, request, response }: HttpContext) {
     // Para limpar qualquer campo do produto, basta enviar a key com value vazio, null.

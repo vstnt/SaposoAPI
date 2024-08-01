@@ -60,14 +60,15 @@ router.put('/api/users/:id', [UsersController, 'update'])
 router.delete('/api/users/:id', [UsersController, 'delete'])
 
 // Produtos
-router.get('/api/products', [ProductsController, 'indexall'])
-router.post('/api/products', [ProductsController, 'store'])
-router.get('/api/products/newest', [ProductsController, 'newest'])
+router.get('/api/products', [ProductsController, 'indexall']) // lista todos os produtos
+router.post('/api/products', [ProductsController, 'store']) // Adicionar produto
+router.post('/productstore/lot', [ProductsController, 'storelot']) // adicionar produtos aos montes
+router.get('/api/products/newest', [ProductsController, 'newest']) // lista mais novos
 router.get('/api/products/search', [ProductsController, 'search'])
 router.get('/api/products/:id', [ProductsController, 'indexunit'])
-router.put('/api/products/:id', [ProductsController, 'update'])
-router.delete('/api/products/:id', [ProductsController, 'delete'])
-router.get('/api/products/top-selling', [ProductsController, 'topSelling'])
+router.put('/api/products/:id', [ProductsController, 'update']) // atualizar produto
+router.delete('/api/products/:id', [ProductsController, 'delete']) // deletar produto
+router.get('/api/products/top-selling', [ProductsController, 'topSelling']) // lista mais vendidos
 
 // Pedidos
 router.post('api/orders', [OrdersController, 'store'])
