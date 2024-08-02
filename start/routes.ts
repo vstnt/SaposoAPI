@@ -40,6 +40,23 @@ router.post('/run-migrations', async ({ request, response }) => {
   })
 })
 
+router.post('/fresh-migrations', async ({ request, response }) => {
+  const secret = request.input('secret')
+
+  if (secret !== process.env.MIGRATION_SECRET) {
+    return response.unauthorized('Invalid secret')
+  }
+
+  exec('node ace migration:fresh --force', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error: ${stderr}`)
+      return response.internalServerError('Migration failed')
+    }
+    console.log(`Success: ${stdout}`)
+    return response.ok('Migrations ran successfully')
+  })
+})
+
 
 // Autenticação de usuário
 router.post('/api/signin', [AuthController, 'signin'])
