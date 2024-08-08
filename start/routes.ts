@@ -36,7 +36,7 @@ router.post('/run-migrations', async ({ request, response }) => {
       return response.internalServerError('Migration failed')
     }
     console.log(`Success: ${stdout}`)
-    return response.ok('Migrations ran successfully')
+    return 'Migrations ran successfully'
   })
 })
 
@@ -53,7 +53,7 @@ router.post('/fresh-migrations', async ({ request, response }) => {
       return response.internalServerError('Migration failed')
     }
     console.log(`Success: ${stdout}`)
-    return response.ok('Migrations ran successfully')
+    return 'Migrations ran successfully'
   })
 })
 
