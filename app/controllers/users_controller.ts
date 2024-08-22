@@ -93,7 +93,7 @@ export default class UsersController {
     const image = images[0]
 
     // Checamos se o usuário existe
-    const user: User | null = await User.find(params.id)
+    const user: User | null = await User.findBy('uid', params.id)
     if (!user) {
       return 'Usuário não encontrado'
     }
@@ -149,7 +149,7 @@ export default class UsersController {
 
 
   async delete({ params }: HttpContext) {
-    const user: User | null = await User.find(params.uid)
+    const user: User | null = await User.findBy('uid', params.id)
     if (user) {
       const imageDelPath = user.imageDelPath
       let cart = await Cart.findBy('uid', user.uid)
