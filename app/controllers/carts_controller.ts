@@ -82,44 +82,48 @@ export default class CartsController {
       const itemQuantity = parseInt(quantity, 10); // transformamos em int e o 10 serve pra caso o valor venha como 002 por exemplo, pra ficar em base 10
       if (itemQuantity == 0) { return { message: 'Insira uma quantidade diferente de zero para o produto'} }
       if (isNaN(itemQuantity)) { return { message: 'Quantidade inválida' } }
-      const cart = await Cart.findByOrFail('uid', uid)
-      const product = await Product.findOrFail(product_id)
+      //const cart = await Cart.findByOrFail('uid', uid)
+      if(uid) {
+        const cart = await Cart.query().where('uid', uid).preload('items').firstOrFail()
 
-      // então checamos se o item já não está no carrinho
-      const existingItem = await CartItem.query()
-        .where('cartId', cart.id)
-        .andWhere('product_id', product_id)
-        .first();
+        const product = await Product.findOrFail(product_id)
 
-      // se não está, criamos um novo item no carrinho
-      if(!existingItem){
-        if(itemQuantity < 0) { // quantidade negativa, rejeitamos.
-          return { message: 'Não é possível subtrair de um item inexistente' }
-        }
-        await CartItem.create({
-          cartId: cart.id,
-          productId: product.id,
-          quantity: itemQuantity,
-          price: product.price
-        })
+        // então checamos se o item já não está no carrinho
+        const existingItem = await CartItem.query()
+          .where('cartId', cart.id)
+          .andWhere('product_id', product_id)
+          .first();
+
+        // se não está, criamos um novo item no carrinho
+        if(!existingItem){
+          if(itemQuantity < 0) { // quantidade negativa, rejeitamos.
+            return { message: 'Não é possível subtrair de um item inexistente' }
+          }
+          await CartItem.create({
+            cartId: cart.id,
+            productId: product.id,
+            quantity: itemQuantity,
+            price: product.price
+          })
       
-      // se já está, atualizamos a quantidade no carrinho
-      } else { 
-        existingItem.quantity += itemQuantity
-        existingItem.price = product.price // atualizamos o preço de acordo com o preço do produto na db, e não do valor do item no carrinho! Isso dá segurança.
-        if(existingItem.quantity <= 0) { // se a quantidade de items ficar negativa ou igual a 0, excluímos o item do carrinho
-          existingItem.delete()
-        } else {
-          await existingItem.save();
+        // se já está, atualizamos a quantidade no carrinho
+        } else { 
+          existingItem.quantity += itemQuantity
+          existingItem.price = product.price // atualizamos o preço de acordo com o preço do produto na db, e não do valor do item no carrinho! Isso dá segurança.
+          if(existingItem.quantity <= 0) { // se a quantidade de items ficar negativa ou igual a 0, excluímos o item do carrinho
+            existingItem.delete()
+          } else {
+            await existingItem.save();
+          }
         }
+
+        // por fim, atualizamos o valor total do carrinho (sempre contando todos os valores, e não utilizando o total anterior)
+        // e retornamos o total e os itens do carrinho
+        const cartItems = await CartItem.query().where('cartId', cart.id);
+        cart.total = cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
+        await cart.save()
+        return ({total:cart.total, items:cartItems})
       }
-
-      // por fim, atualizamos o valor total do carrinho (sempre contando todos os valores, e não utilizando o total anterior)
-      const cartItems = await CartItem.query().where('cartId', cart.id);
-      cart.total = cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
-      await cart.save()
-
-      return { message: 'Item atualizado no carinho' };
 
     } catch (error) {
       if (error.code === 'E_ROW_NOT_FOUND') {
