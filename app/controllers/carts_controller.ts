@@ -122,7 +122,14 @@ export default class CartsController {
         const cartItems = await CartItem.query().where('cartId', cart.id);
         cart.total = cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
         await cart.save()
-        return ({total:cart.total, items:cartItems})
+        const cart2 = await Cart.query().where('uid', uid).preload('items').firstOrFail()
+        const items = cart2.items.map((item: { productId: number; quantity: number; price: number; createdAt: TimestampKeywords }) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price,
+          createdAt: new Date(item.createdAt).getTime(),
+        }));
+        return ({total:cart.total, items:items})
       }
 
     } catch (error) {
