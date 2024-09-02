@@ -52,6 +52,7 @@ export default class ProductsController {
       const imageUrl = `${productsImgsUrl}${imageName}`
       const imageDelPath = `${productsImgsPath}${imageName}`
       const productData = request.only(['name', 'description', 'price', 'quantity'])
+      productData.price = parseFloat(productData.price)
       await Product.create({ ...productData, imageUrl, imageDelPath })
       await image.move(app.publicPath(`${productsImgsPublicPath}`), { name: imageName })
 
