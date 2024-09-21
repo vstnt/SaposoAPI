@@ -122,13 +122,11 @@ router.post('/testeinfobip', async ({ request }) => {
   const results = messageData.results || [];
 
   // Se existir um resultado, extraímos o objeto message
-  if (results) {
-    const message = results.message; 
+  if (results.length > 0) {
+    const message = results[0].message; 
     console.log('Conteúdo da mensagem:', message);
+  } else {
     console.log('Nenhuma mensagem encontrada nos resultados.');
-  }
-  else {
-    console.log('results nulo')
   }
 
   return 'Requisition received in console';
