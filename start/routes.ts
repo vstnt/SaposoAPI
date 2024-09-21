@@ -116,11 +116,6 @@ router.get('api/cart/clear', [CartsController, 'clearCart']).use(middleware.auth
 
 
 
-router.post('/testeinfobip', async ({request}) => {
-  const messageobject = request.all();
-  console.log(messageobject);
-  return 'requisition received on console'
-})
 
 router.post('/testeinfobip', async ({ request }) => {
   const messageData = request.all(); 
