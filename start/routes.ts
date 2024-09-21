@@ -114,7 +114,7 @@ router.post('api/cart/updateitem', [CartsController, 'updateItem']).use(middlewa
 router.post('api/cart/deleteitem', [CartsController, 'deleteItem']).use(middleware.auth())
 router.get('api/cart/clear', [CartsController, 'clearCart']).use(middleware.auth())
 
-router.post('testeinfobip', async (/* {request, response} */) => {
+router.post('/testeinfobip', async (/* {request, response} */) => {
   //const fileredreq = request.completeUrl
   console.log('requisition received on console')
   //console.log(fileredreq)
