@@ -114,10 +114,10 @@ router.post('api/cart/updateitem', [CartsController, 'updateItem']).use(middlewa
 router.post('api/cart/deleteitem', [CartsController, 'deleteItem']).use(middleware.auth())
 router.get('api/cart/clear', [CartsController, 'clearCart']).use(middleware.auth())
 
-router.post('/testeinfobip', async (/* {request, response} */) => {
-  //const fileredreq = request.completeUrl
-  console.log('requisition received on console')
-  //console.log(fileredreq)
-  //console.log('requisition received on console: requisition whole body ended.')
-  //return response.json('Let`s see if we can reveive the wpp message from infobip. And, let`s discover how to isolate the response from infobit.')
+
+
+router.post('/testeinfobip', async ({request}) => {
+  const messageData = request.all();
+  console.log('Mensagem recebida:', messageData);
+  return 'requisition received on console'
 })
