@@ -117,7 +117,21 @@ router.get('api/cart/clear', [CartsController, 'clearCart']).use(middleware.auth
 
 
 router.post('/testeinfobip', async ({request}) => {
-  const messageData = request.all();
-  console.log('Mensagem recebida:', messageData);
+  const messageobject = request.all();
+  console.log(messageobject);
   return 'requisition received on console'
 })
+
+router.post('/testeinfobip', async ({ request }) => {
+  const messageData = request.all(); 
+  const results = messageData.results || [];
+
+  // Se existir um resultado, extraímos o objeto message
+  if (results.length > 0) {
+    const message = results[0].message; 
+    console.log('Conteúdo da mensagem:', message);
+    console.log('Nenhuma mensagem encontrada nos resultados.');
+  }
+
+  return 'Requisition received in console';
+});
