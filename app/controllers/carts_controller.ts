@@ -40,6 +40,7 @@ export default class CartsController {
       }
       return 'Carrinho criado ou já existia'
     } catch (error) {
+      console.log("erro no chamado de createCart, no carts_controller")
       return response.status(400).send(error)
     }
   }
