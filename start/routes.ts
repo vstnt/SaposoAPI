@@ -126,4 +126,4 @@ router.post('/testeinfobip', async ({ request }) => {
   return 'Requisition received in console';
 });
 
-router.post('api/bigsaposochat', [ChatsController, 'bigSaposoChat'])
+//router.post('api/bigsaposochat', [ChatsController, 'bigSaposoChat'])
