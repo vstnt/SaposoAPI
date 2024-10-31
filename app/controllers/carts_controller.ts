@@ -30,14 +30,18 @@ export default class CartsController {
   }
 
 
-  async createCart({ request }: HttpContext) {
-    console.log('createCart chamado')
-    const { uid } = request.only(['uid'])
-    let cart = await Cart.findBy('uid', uid)
-    if (!cart){
-      await Cart.create({uid: uid, total: 0})
+  async createCart({ request, response }: HttpContext) {
+    try {
+      console.log('createCart chamado')
+      const { uid } = request.only(['uid'])
+      let cart = await Cart.findBy('uid', uid)
+      if (!cart){
+        await Cart.create({uid: uid, total: 0})
+      }
+      return 'Carrinho criado ou já existia'
+    } catch (error) {
+      return response.status(400).send(error)
     }
-    return 'Carrinho criado'
   }
 
 

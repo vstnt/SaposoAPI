@@ -9,6 +9,7 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 import redis from '@adonisjs/redis/services/main'
 import { exec } from 'child_process'
+import ChatsController from '#controllers/chats_controller'
 
 router.get('/test-redis', async ({ response }) => {
   await redis.set('test', 'working')
@@ -22,7 +23,7 @@ router.get('/', async () => {
   }
 })
 
-// endpoint protegido por chave secreta para rodar as migrations
+// endpoints protegidos por chave secreta para rodar as migrations ou resetá-las
 router.post('/run-migrations', async ({ request, response }) => {
   const secret = request.input('secret')
 
@@ -103,20 +104,13 @@ router.get('api/carts', [CartsController, 'indexCarts'])
 router.get('api/cartsitems', [CartsController, 'indexCartsItems'])
 router.post('api/carts/create', [CartsController, 'createCart'])
 router.post('api/carts/delete', [CartsController, 'deleteCart'])
-
-/* alterado para JWT
-router.get('api/cart', [CartsController, 'viewCart']).use(middleware.auth({guards: ['api']}))
-router.post('api/cart/updateitem', [CartsController, 'updateItem']).use(middleware.auth({guards: ['api']}))
-router.post('api/cart/deleteitem', [CartsController, 'deleteItem']).use(middleware.auth({guards: ['api']}))
-router.get('api/cart/clear', [CartsController, 'clearCart']).use(middleware.auth({guards: ['api']})) */
 router.get('api/cart', [CartsController, 'viewCart']).use([middleware.auth(), middleware.checkRevokedToken()])
 router.post('api/cart/updateitem', [CartsController, 'updateItem']).use(middleware.auth())
 router.post('api/cart/deleteitem', [CartsController, 'deleteItem']).use(middleware.auth())
 router.get('api/cart/clear', [CartsController, 'clearCart']).use(middleware.auth())
 
 
-
-
+// teste do whatsapp via infobip
 router.post('/testeinfobip', async ({ request }) => {
   const messageData = request.all(); 
   const results = messageData.results || [];
@@ -131,3 +125,5 @@ router.post('/testeinfobip', async ({ request }) => {
 
   return 'Requisition received in console';
 });
+
+router.post('api/bigsaposochat', [ChatsController, 'bigSaposoChat'])
