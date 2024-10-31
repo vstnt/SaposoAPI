@@ -9,7 +9,7 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 import redis from '@adonisjs/redis/services/main'
 import { exec } from 'child_process'
-import ChatsController from '#controllers/chats_controller'
+//import ChatsController from '#controllers/chats_controller'
 
 router.get('/test-redis', async ({ response }) => {
   await redis.set('test', 'working')
